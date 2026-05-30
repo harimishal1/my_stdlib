@@ -9,14 +9,21 @@ struct _book {
 };
 
 void printer(my_vector<my_shared_pointer<_book>>& vectr){
-    std::cout<<vectr[0]->book_id_title.second<<"\n";
-    printf("%p \n", vectr[0].get());
+    std::cout<<"Book 1 is: "<<vectr[0]->book_id_title.second<<"\n";
+    printf("Stored at: %p \n", vectr[0].get());
 }
 
 int main(){
     my_shared_pointer<_book> book(new _book{{1, "Modern Operating Systems"}, false});
+    std::cout<<"Shared reference is: "<<book.use_count()<<"\n";
     my_vector<my_shared_pointer<_book>> vectr;
     vectr.push_back(book);
+    std::cout<<"Shared reference is: "<<book.use_count()<<"\n";
     printer(vectr);
+    my_shared_pointer<_book> book2 = book;
+    std::cout<<"Shared reference is: "<<book.use_count()<<"\n";
+    book2.reset();
+    std::cout<<"Shared reference is: "<<book.use_count()<<"\n";
+
     return 0 ;
 }

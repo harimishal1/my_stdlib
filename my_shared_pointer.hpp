@@ -65,6 +65,10 @@ public:
         return *ptr;
     }
 
+    explicit operator bool() const {
+        return ptr != nullptr;
+    }
+
     my_shared_pointer& operator=(const my_shared_pointer& other) {
         if (this == &other) {
             return *this;
@@ -80,6 +84,27 @@ public:
 
         return *this;
     }
+
+    my_shared_pointer& operator=(my_shared_pointer&& other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        release();
+
+        ptr = other.ptr;
+        control_block = other.control_block;
+
+        other.ptr = nullptr;
+        other.control_block = nullptr;
+
+        return *this;
+    }
+
+    void reset() {
+        release();
+    }
+
     ~my_shared_pointer(){
         release();
     }
