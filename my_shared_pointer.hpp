@@ -26,24 +26,70 @@ private:
     }
 
 public:
+    // default constructor
     my_shared_pointer()
         : ptr(nullptr),
           control_block(nullptr)
     {
     }
 
+    // initialiser list
     my_shared_pointer(T* raw_ptr)
         :   ptr(raw_ptr),
             control_block(raw_ptr ? new ControlBlock{1} : nullptr)
     {
     }
 
+    // copy constructor
     my_shared_pointer(const my_shared_pointer& other)
         :   ptr(other.ptr),
             control_block(other.control_block)
         {
             if(control_block) control_block->shared_count++;
         }
+
+    //copy assignment
+    my_shared_pointer& operator=(const my_shared_pointer& other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        release();
+        ptr = other.ptr;
+        control_block = other.control_block;
+
+        if (control_block) {
+            control_block->shared_count++;
+        }
+
+        return *this;
+    }
+
+    // move assignment
+    my_shared_pointer& operator=(my_shared_pointer&& other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        release();
+
+        ptr = other.ptr;
+        control_block = other.control_block;
+
+        other.ptr = nullptr;
+        other.control_block = nullptr;
+
+        return *this;
+    }
+
+    // move constructor
+    my_shared_pointer(my_shared_pointer&& other)
+        : ptr(other.ptr),
+          control_block(other.control_block)
+    {
+        other.ptr = nullptr;
+        other.control_block = nullptr;
+    }
 
     size_t use_count() const {
         if(control_block){
@@ -52,6 +98,7 @@ public:
         return 0;
     }
 
+    //just operators
     T* operator->() const {
         return ptr;
     }
@@ -69,42 +116,11 @@ public:
         return ptr != nullptr;
     }
 
-    my_shared_pointer& operator=(const my_shared_pointer& other) {
-        if (this == &other) {
-            return *this;
-        }
-
-        release();
-        ptr = other.ptr;
-        control_block = other.control_block;
-
-        if (control_block) {
-            control_block->shared_count++;
-        }
-
-        return *this;
-    }
-
-    my_shared_pointer& operator=(my_shared_pointer&& other) {
-        if (this == &other) {
-            return *this;
-        }
-
-        release();
-
-        ptr = other.ptr;
-        control_block = other.control_block;
-
-        other.ptr = nullptr;
-        other.control_block = nullptr;
-
-        return *this;
-    }
-
     void reset() {
         release();
     }
 
+    //destructor
     ~my_shared_pointer(){
         release();
     }
