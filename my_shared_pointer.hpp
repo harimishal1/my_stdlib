@@ -13,6 +13,18 @@ private:
     T* ptr = nullptr;
     ControlBlock* control_block = nullptr;
 
+    void release(){
+        if(control_block){
+            control_block->shared_count--;
+            if(control_block->shared_count == 0){
+                delete ptr;
+                delete control_block;
+            }
+        }
+        ptr = nullptr;
+        control_block = nullptr;
+    }
+
 public:
     my_shared_pointer()
         : ptr(nullptr),
@@ -33,16 +45,11 @@ public:
             if(control_block) control_block->shared_count++;
         }
 
-    void release(){
+    size_t use_count() const {
         if(control_block){
-            control_block->shared_count--;
-            if(control_block->shared_count == 0){
-                delete ptr;
-                delete control_block;
-            }
+            return control_block->shared_count;
         }
-        ptr = nullptr;
-        control_block = nullptr;
+        return 0;
     }
 
     T* operator->() const {
