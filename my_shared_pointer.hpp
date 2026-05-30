@@ -33,14 +33,7 @@ public:
             if(control_block) control_block->shared_count++;
         }
 
-    T* operator->() const {
-        return ptr;
-    }
-    T* get() const {
-        return ptr;
-    }
-
-    ~my_shared_pointer(){
+    void release(){
         if(control_block){
             control_block->shared_count--;
             if(control_block->shared_count == 0){
@@ -48,5 +41,39 @@ public:
                 delete control_block;
             }
         }
+        ptr = nullptr;
+        control_block = nullptr;
+    }
+
+    T* operator->() const {
+        return ptr;
+    }
+
+    T* get() const {
+        return ptr;
+    }
+
+    T& operator*() const {
+        // this allows: (*book).read
+        return *ptr;
+    }
+
+    my_shared_pointer& operator=(const my_shared_pointer& other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        release();
+        ptr = other.ptr;
+        control_block = other.control_block;
+
+        if (control_block) {
+            control_block->shared_count++;
+        }
+
+        return *this;
+    }
+    ~my_shared_pointer(){
+        release();
     }
 };

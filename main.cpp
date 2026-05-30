@@ -13,7 +13,7 @@ struct _book {
 
 void printer(my_vector<my_shared_pointer<_book>>& vectr){
     cout<<vectr[0]->book_id_title.second<<"\n";
-    cout<<vectr[0].get();
+    printf("%p \n", vectr[0].get());
 }
 
 int main(){
